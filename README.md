@@ -1,1 +1,1 @@
-# CSE442-MessengerApplication-Fall2017
+# DovesMessenger
