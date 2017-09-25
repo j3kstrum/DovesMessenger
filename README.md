@@ -2,11 +2,12 @@
 
 To launch the application click on login.html available in login folder
 
-This is the prototype of the product we are developing throughout the whole semester, later on we will be implementing based on this:
-The website is like a "log-in" page, there are "Email address" field and "Password" field which will let users to fill up with.
-User can select "Remember me" to remember his/her account log-in information.
-There is "Login" Button as well as the "Please Sign Up Here" button which will redirect you to a new page for you to register:
-The new page is for registering, there are "Email Address" field, "Full Name"field, "Phone Number" field, "Password" field, and "Confirm Password" field. In the bottom you can choose to "I accept your terms and Conditions". There you go, you can click the "Register" so as to complete the whole registration process.
-You can also feel free to switch back to the login page while you click the "I already have an account".
-So far if you click on the "Login" button it will just show you a demo.
-The demo is just showing you that there are two users sending messages to each other.
+
+This is the prototype of the product we are developing.
+
+The application is a website consisting of a "log-in" page. There is a "Email address" and "Password" field followed by a login button which will allow users to login and proceed to the next page where they can chat with other users.
+Users can also select "Remember me" to remember his/her account log-in information.
+
+There is also a "Please Sign Up Here" button which redirects to a new page where new users can register themselves:
+In the new page there are the "Email Address" field, "Full Name" field, "Phone Number" field, "Password" field, and "Confirm Password" field. After filling out the fields the user needs to go to the bottom of the page where the user has to check "I accept your Terms and Conditions". Then a user can select register which would add the user to the list of users.
+Also a user can switch back to the login page by clicking "I already have an account".
