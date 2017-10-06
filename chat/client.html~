@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html>
+    
+    <head>
+         <!-- ws://127.0.0.1:3000?t=test -->
+        <!--Setting the style of an HTML element, can be done with the style attributes.-->
+        <!--The <script> element either contains scripting statements, or it points to an external script file through the src attribute.-->
+        <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <title>Chat</title>
+                <link rel="stylesheet" href="">
+                    <!-- The <script> tag is used to define a client-side script (JavaScript).-->
+                    <script language="JavaScript" src="http://code.jquery.com/jquery-1.11.0.js"></script>
+                    <script type="text/javascript">
+                        </script>
+    </head>
+    <style type="text/css" media="screen">
+        div {
+            border: 1px solid #cccccc;
+            width: 500px;
+            min-height: 100px;
+        }
+    </style>
+    
+    <body>
+        <div id="show">
+        </div>
+        <input type="text" id="message" name="" value="" placeholder="">
+            <input type="text" id="name" value="" placeholder="Nickname;">
+                <a href="javascript:void(0)" onclick="send()">Send</a>
+                <!--<a href="javascript:void(0)" onclick="exit()">Quit</a> -->
+                <!-- <input type="text" id="token" name="" value="" placeholder="" readonly="false"> -->
+    </body>
+    <script type="text/javascript">
+        var ws = new WebSocket("ws://127.0.0.1:3000?t=test");
+        ws.onopen = function() {
+            console.log("Connection Status", ws);
+            //
+            $("#show").html("Connection Status;" + ws.readyState + "</br>");
+            console.log("open");
+            ws.open("start");
+        };
+    /*### websocket.onmessage
+    
+    - {Function}
+    
+    An event listener to be called when a message is received from the server. The
+    listener receives a `MessageEvent` named "message".
+    
+    ### websocket.onopen
+    
+    - {Function}
+    
+    An event listener to be called when the connection is established. The listener
+     receives an `OpenEvent` named "open".
+     ### websocket.onerror
+     
+     - {Function}
+     
+     An event listener to be called when an error occurs. The listener receives
+     an `Error` instance.*/
+    ws.onmessage = function(evt) {
+        // console.log(evt.data)
+        // alert(evt.data);
+        $("#show").append(evt.data + "</br>");
+    };
+    //ws.onclose = function(evt) {
+        //console.log("WebSocketClosed!");
+        //console.log(evt);
+    //};
+    //ws.onerror = function(evt) {
+        //console.log("WebSocketError!");
+    //};
+    
+    function send() {
+        var messages = $("#message").val();
+        var tok = $("#token").val();
+        var username = $("#name").val();
+        //var str = "{name:'" + name + "',message:'" + message + "',token:'" + token + "'}";
+        console.log("Send", "{name:'" + username + "',message:'" + messages + "',token:'" + tok + "'}");
+        ws.send("{name:'" + username + "',message:'" + messages + "',token:'" + tok + "'}");
+    };
+    
+    //function exit() {
+        //var r = ws.close();
+        //console.log("Quit", r);
+    //}
+    </script>
+    
+</html>
+
+
