@@ -4,7 +4,6 @@ var fs = require("fs");
 var bodyParser = require("body-parser");
 
 var MongoClient = require('mongodb').MongoClient;
-var bcrypt = require('bcrypt');
 var url = "mongodb://localhost:27017/mydb";
 
 app.use(express.static('.'));
@@ -14,12 +13,19 @@ app.use(bodyParser.urlencoded({ extended: true }));//Parses incoming requests wi
 app.post('/login', function(req,res) {
 	console.log('Email:' + req.body.email);
 	console.log('password:' + req.body.password);
-	if(login(req.body.email,req.body.password)){
-		res.write('0');
-	}
-	else{
+	var y1=login(req.body.email,req.body.password);
+	y1.then(function(a){
+		if(a){
+			res.write('0');
+		}
+		else{
+			res.write('1');
+		}
+		console.log(a);
+	}).catch(function error(err){
 		res.write('1');
-	}
+		console.log(err);
+	});
 	//res.write('1');
 	res.end();
 });
@@ -30,12 +36,19 @@ app.post('/register', function(req,res) {
 	console.log('name:' + req.body.name);
 	console.log('cell:' + req.body.cell);
 //call registration, return '1' if success, '0' if failed ays
-    if(insertUser(req.body.name,req.body.password,req.body.email,req.body.cell)){
-    	res.write('0');
-    }
-    else{
-    	res.write('1');
-    }
+    var y2=insertUser(req.body.name,req.body.password,req.body.email,req.body.cell);
+	y2.then(function(a){
+	if(a){
+		res.write('0');
+	}
+	else{
+		res.write('1');
+	}
+	console.log(a);
+	}).catch(function error(err){
+		res.write('1');
+		console.log(err);
+	});
 	//res.write('0');
 	res.end();
 });
@@ -52,6 +65,7 @@ var server = app.listen(8081, function () {
 Below is the code for the database
 Creating a database
 */
+
 function createDB(){
 MongoClient.connect(url, function(err, db) {
   if (err) throw err;
@@ -64,13 +78,13 @@ Creating a collection named Users
 */
 function createCollection(){
 MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
+  if (err) throw err;25
   //Create a collection name "Users":
   db.createCollection("Users", function(err, res) {
     if (err) throw err;
     console.log("Collection Successfully Created!");
     db.close();
-  });
+51  });
 });
 }
 /*
@@ -79,36 +93,31 @@ Inserting a new user to Users with fields of name, password and email. More deta
 function insertUser(name,password,email,phone){
 createDB();
 createCollection();
-var flag=0;
+return new Promise(function(resolve,reject){
+var promise=findUser(email);
+var res=false;
+promise.then(function(arr){
+if(arr.length==0){
 MongoClient.connect(url, function(err, db) {
-  if (err) {throw err;}
-  var query = { email: email };
-  db.collection("Users").find(query).toArray(function(err, result) {
-    if (err) {throw err;// if empty array then wrong details entered so show enter correct username/password
-    }
-    //console.log(result);
-    db.close();
-   if(result.length!=0){console.log("Username Already Exists"); flag=1;}
-   else{
-   MongoClient.connect(url, function(err, db) {
-   if (err) throw err;
+   if (err) reject(err);
    var myobj = { username: name, password: password, email: email, phone: phone};
-   //db.members.createIndex({ "email":email }, { unique: true });
    db.collection("Users").insertOne(myobj, function(err, res) {
-    if (err) throw err;
+    if (err) reject(err) ;
     console.log("User Added");
+    res=true;
+    resolve(res);
     db.close();
-  });
-}); 
-}
-  });
 });
-if(flag==0){
-	return true;
+});
 }
 else{
-	return false;
+console.log("Username Already Exists");
+resolve(res);
 }
+}).catch(function error(err){
+reject(err);
+});
+});
 }
 /*
 Shows all users present on our database
@@ -123,46 +132,47 @@ MongoClient.connect(url, function(err, db) {
   });
 }); 
 }
+
 /*
 Looks for a user in our database. If user not present then throws error
 */
 function findUser(em){
+return new Promise(function(resolve,reject){
 MongoClient.connect(url, function(err, db) {
-  if (err) {throw err;}
+  if (err) {reject(err);}
   var query = { email: em };
   db.collection("Users").find(query).toArray(function(err, result) {
-    if (err) {throw err;// if empty array then wrong details entered so show enter correct username/password
+    if (err) {reject(err);// if empty array then wrong details entered so show enter correct username/password
     }
-    console.log(result);
     db.close();
-   if(result.length==0){return false;}return true;
+    resolve(result);
   });
-});  
+});
+});
 }
+
 /*
 Login a user
-*/
+*/    
 function login(ulog,pass){
-var flag=0;
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  var query = { email: ulog };
-  db.collection("Users").find(query).toArray(function(err, result) {
-    if (err) throw err;
-    //console.log(result);// if empty array then wrong details entered so show enter correct username/password
-    db.close();
-    if(result.length==0){console.log("Wrong Username");return false;}
-    if((result[0].password).localeCompare(pass)==0){console.log("Successfully logged in");}
-    else{console.log("Wrong Password");flag=1;}
-  });
-});  
-if(flag==0){
-	return true;
+return new Promise(function(resolve,reject){
+var promise=findUser(ulog);
+var res=false;
+promise.then(function(arr){
+if(arr.length!=0){
+if((arr[0].password).localeCompare(pass)==0){res=true;console.log("Successfully logged in");}
+    else{console.log("Wrong Password");}
 }
 else{
-	return false;
+console.log("Wrong Username");
 }
+resolve(res);
+}).catch(function error(err){
+reject(err);
+});
+});
 }
+
 /*
 Delete user with a given email address
 */
