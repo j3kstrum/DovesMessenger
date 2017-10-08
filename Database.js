@@ -1,9 +1,9 @@
 var MongoClient = require('mongodb').MongoClient;
-var bcrypt = require('bcrypt');
+//var bcrypt = require('bcrypt');
 var url = "mongodb://localhost:27017/mydb";
-/*
-Creating a database
-*/
+
+var logval=1;
+
 function createDB(){
 MongoClient.connect(url, function(err, db) {
   if (err) throw err;
@@ -16,41 +16,45 @@ Creating a collection named Users
 */
 function createCollection(){
 MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
+  if (err) throw err;25
   //Create a collection name "Users":
   db.createCollection("Users", function(err, res) {
     if (err) throw err;
     console.log("Collection Successfully Created!");
     db.close();
-  });
+51  });
 });
 }
 /*
 Inserting a new user to Users with fields of name, password and email. More details can be added later
 */
-function insertUser(name,password,email){
+function insertUser(name,password,email,phone){
+//createDB();
+//createCollection();
+return new Promise(function(resolve,reject){
+var promise=findUser(email);
+var res=false;
+promise.then(function(arr){
+if(arr.length==0){
 MongoClient.connect(url, function(err, db) {
-  if (err) {throw err;}
-  var query = { email: email };
-  db.collection("Users").find(query).toArray(function(err, result) {
-    if (err) {throw err;// if empty array then wrong details entered so show enter correct username/password
-    }
-    //console.log(result);
-    db.close();
-   if(result.length!=0){console.log("Username Already Exists");}
-   else{
-   MongoClient.connect(url, function(err, db) {
-   if (err) throw err;
-   var myobj = { username: name, password: password, email: email};
-   //db.members.createIndex({ "email":email }, { unique: true });
+   if (err) reject(err);
+   var myobj = { username: name, password: password, email: email, phone: phone};
    db.collection("Users").insertOne(myobj, function(err, res) {
-    if (err) throw err;
+    if (err) reject(err) ;
     console.log("User Added");
+    res=true;
+    resolve(res);
     db.close();
-  });
-}); 
+});
+});
 }
-  });
+else{
+console.log("Username Already Exists");
+resolve(res);
+}
+}).catch(function error(err){
+reject(err);
+});
 });
 }
 /*
@@ -70,35 +74,48 @@ MongoClient.connect(url, function(err, db) {
 Looks for a user in our database. If user not present then throws error
 */
 function findUser(em){
+return new Promise(function(resolve,reject){
 MongoClient.connect(url, function(err, db) {
-  if (err) {throw err;}
+  if (err) {reject(err);}
   var query = { email: em };
   db.collection("Users").find(query).toArray(function(err, result) {
-    if (err) {throw err;// if empty array then wrong details entered so show enter correct username/password
+    if (err) {reject(err);// if empty array then wrong details entered so show enter correct username/password
     }
-    console.log(result);
+    //console.log(result);
     db.close();
-   if(result.length==0){return false;}return true;
+   //if(result.length==0){return false;}return true;
+    resolve(result);
   });
-});  
+});
+});
 }
 /*
 Login a user
 */
+    
 function login(ulog,pass){
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  var query = { email: ulog };
-  db.collection("Users").find(query).toArray(function(err, result) {
-    if (err) throw err;
-    //console.log(result);// if empty array then wrong details entered so show enter correct username/password
-    db.close();
-    if(result.length==0){console.log("Wrong Username");return false;}
-    if((result[0].password).localeCompare(pass)==0){console.log("Successfully logged in");return true;}
-    else{console.log("Wrong Password");return false;}
-  });
-});  
+return new Promise(function(resolve,reject){
+var promise=findUser(ulog);
+var res=false;
+promise.then(function(arr){
+if(arr.length!=0){
+if((arr[0].password).localeCompare(pass)==0){res=true;console.log("Successfully logged in");}
+    else{console.log("Wrong Password");}
 }
+else{
+console.log("Wrong Username");
+}
+resolve(res);
+}).catch(function error(err){
+reject(err);
+});
+});
+}
+/*function login(mail,pass, callback){
+callback(mail,pass);
+//if(logval==0){return true;}else{return false;}
+}*/
+
 /*
 Delete user with a given email address
 */
@@ -113,6 +130,12 @@ MongoClient.connect(url, function(err, db) {
   });
 });
 }
+
+
+
+/*
+For testing remove the needed comments under
+*/
 
 /*bcrypt.hash("GuessMe", 10, function(err, hash) {
   // Store hash in your password DB.
@@ -139,7 +162,16 @@ console.log(hash);
   });
 });*/
 //var w=allUsers();
-//var x=findUser("vikramga@buffalo.edu");
-//var y=insertUser("name","pass","em");
+var y=insertUser("abc","123","abcde@buffalo.edu","123");
+y.then(function(a){
+console.log(a);
+}).catch(function error(err){
+console.log(err);
+});
+//console.log(logval);
+//var y1=login("abc@buffalo.edu","123",authenticate);
+//console.log(logval);
+//var k=findUser("abc@buffalo.edu");
+//console.log(y1);
+//var y=insertUser("abc","123","abc@buffalo.edu","123456");
 //var z=deleteUser("em");
-//console.log(y);
