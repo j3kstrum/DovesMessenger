@@ -1,4 +1,4 @@
-//@Author  Jeiwei Shen, Qinxin Tian, Veronica Ng and Vikram Garu
+//@Author  Tushar Seth, Jeiwei Shen, Qinxin Tian, Veronica Ng and Vikram Garu
 
 
 //https://github.com/websockets/ws
@@ -13,11 +13,10 @@
 //https://www.youtube.com/watch?v=tHbCkikFfDE
 
 
-//The Websocket protocol implements so called PING/PONG messages to keep Websockets alive,
-//even behind proxies, firewalls and load-balancers. The server sends a 
-//PING message to the client through the Websocket, which then replies 
-//with PONG. If the client does not reply, the server closes the 
-//connection.
+/*The Websocket protocol implements so called PING/PONG messages to keep Websockets alive,
+even behind proxies, firewalls and load-balancers. The server sends a 
+PING message to the client through the Websocket, which then replies 
+with PONG. If the client does not reply, the server closes the connection */
 
 
 var express = require('express');
@@ -27,6 +26,11 @@ var bodyParser = require("body-parser");
 
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://104.131.3.139:27017";
+var bcrypt = require('bcrypt');
+removeDatabase(); //Remember to comment this line out. This line is just to create a new collection again as we didn't have security before
+createDB();
+createCollection();
+
 
 app.use(express.static('.'));
 app.use(bodyParser.json());
@@ -93,17 +97,14 @@ var server = app.listen(8081, function () {
 })
 
 /* Below is the code for the WebSocket server */
-//secret key to prevent hacking
-
 //Referenced From  https://www.youtube.com/watch?v=3c9KDf5p_Vc
 //Referenced From   https://www.youtube.com/watch?v=KNgWHVKJ6AE&list=PLIGDNOJWiL19GI17sMIEtlaNCVhUhRFPH
 
-//global object contains a sequence of numbers.
-////The Websocket protocol implements so called PING/PONG messages to keep Websockets alive,
-//even behind proxies, firewalls and load-balancers. The server sends a 
-//PING message to the client through the Websocket, which then replies 
-//with PONG. If the client does not reply, the server closes the 
-//connection.
+/*global object contains a sequence of numbers.
+The Websocket protocol implements so called PING/PONG messages to keep Websockets alive,
+even behind proxies, firewalls and load-balancers. The server sends a 
+PING message to the client through the Websocket, which then replies 
+with PONG. If the client does not reply, the server closes the connection.*/
 
 var secret = null;
 //https://stackoverflow.com/questions/27143585/node-js-script-websocket-error
@@ -133,13 +134,12 @@ wss.broadcast = function broadcast(s,ws) {
 };
 
 // Referenced From  https://www.youtube.com/watch?v=QISU14OrRbI&list=PLfdtiltiRHWHZh8C2G0xNRbcf0uyYzzK_
-
 //Referenced From  https://www.youtube.com/watch?v=czSfzG0EWUo&list=PLI-gk4ISRzCPlJjCz3yuAhL8vnmK6KWr7
 
-//The remote IP address can be obtained from the raw socket.
-//websocketserver, like a parent ws listen the connection, When there is a connection comes in then we pass the function.
-//Emitted when the handshake is complete. request is the http GET request sent by the client. Useful for parsing authority headers
-//cookie headers, and other information.
+/*The remote IP address can be obtained from the raw socket.
+websocketserver, like a parent ws listen the connection, When there is a connection comes in then we pass the function.
+Emitted when the handshake is complete. request is the http GET request sent by the client. Useful for parsing authority headers
+cookie headers, and other information.*/
 wss.on('connection', function(ws, req) {
     console.log("connection");   
     var firstMessage = true;
@@ -222,7 +222,6 @@ const interval = setInterval(function ping() {
 Sources:
 https://www.youtube.com/watch?v=yswb4SkDoj0
 https://www.w3schools.com/nodejs/nodejs_mongodb_create_db.asp
-/*
 Below is the code for the database
 Creating a database
 */
@@ -252,8 +251,6 @@ MongoClient.connect(url, function(err, db) {
 Inserting a new user to Users with fields of name, password and email. More details can be added later
 */
 function insertUser(name,password,email,phone){
-createDB();
-createCollection();
 return new Promise(function(resolve,reject){
 var promise=findUser(email);
 var res=false;
@@ -261,7 +258,9 @@ promise.then(function(arr){
 if(arr.length==0){
 MongoClient.connect(url, function(err, db) {
    if (err) reject(err);
-   var myobj = { username: name, password: password, email: email, phone: phone};
+   var salt=bcrypt.genSaltSync();
+   var hash=bcrypt.hashSync(password,salt);
+   var myobj = { username: name, password: hash, email: email, phone: phone};
    db.collection("Users").insertOne(myobj, function(err, res) {
     if (err) reject(err) ;
     console.log("User Added");
@@ -321,7 +320,7 @@ var promise=findUser(ulog);
 var res=false;
 promise.then(function(arr){
 if(arr.length!=0){
-if((arr[0].password).localeCompare(pass)==0){res=true;console.log("Successfully logged in");}
+if(bcrypt.compareSync(pass,arr[0].password)){res=true;console.log("Successfully logged in");}
     else{console.log("Wrong Password");}
 }
 else{
@@ -344,6 +343,20 @@ MongoClient.connect(url, function(err, db) {
    db.collection("Users").deleteMany(myquery, function(err, obj) {
     if (err) throw err;
     console.log(obj.result.n + " Users Deleted");
+    db.close();
+  });
+});
+}
+
+/*
+Remove the whole collection
+*/
+function removeDatabase(){
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection("Users").drop(function(err, delOK) {
+    if (err) throw err;
+    if (delOK) console.log("Collection deleted");
     db.close();
   });
 });
