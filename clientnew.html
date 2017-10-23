@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+ <!-- Referenced from  https://www.youtube.com/watch?v=QISU14OrRbI&list=PLfdtiltiRHWHZh8C2G0xNRbcf0uyYzzK_  -->
+<!-- Referenced from  https://www.youtube.com/watch?v=tHbCkikFfDE -->
+<!-- referenced from  https://www.google.com/search?q=sky.jpg&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiQkKr3_uLWAhXG1IMKHUZXCw4Q_AUICigB&biw=1366&bih=662#imgrc=NrSVH9jl6j-QcM: -->
+
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Welcome To Doves Messenger</title>
+    <link rel="stylesheet" href="">
+    <script language="JavaScript" src="jquery.js"></script>
+    <script type="text/javascript">
+    </script>
+   <style>
+   body {
+       background-image:url("sky.jpg");
+}
+   </style>
+
+</head>
+<style type="text/css" media="screen">
+div {
+    border: 1px solid #cccccc;
+    width: 3000px;
+    min-height: 200px;
+    overflow:scroll;
+    float:middle;
+    . {padding: 14px 40px;}
+}
+div {
+    width: 600px;
+    height: 30px;
+    padding: 15px;
+    background-color: yellow;
+    box-shadow: 10px 0px;
+}
+</style>
+
+<body>
+    <div id="show">
+    </div>
+    <label id="email">abc</label> 
+    <input type="text" id="message" name="" value="enter text here" placeholder="" onfocus="if (this.value == 'enter text here') {this.value=''}" >  
+<!--
+     <input type="text" id="peername" value="" placeholder="peernickname"> 
+-->
+        
+      <!-- <a href="javascript:void(0)" onclick="send()">send</a> --> 
+    
+    <button type="submit" class="btn btn-primary btn-block" onclick="send()">send</button> 
+    <!--<a href="javascript:void(0)" onclick="exit()">exit</a>  -->
+
+</body>
+<script type="text/javascript">
+$('document').ready(function(){
+$("#email").text(getQueryVariable('email'));
+});
+//from: https://stackoverflow.com/questions/2090551/parse-query-string-in-javascript
+function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        if (decodeURIComponent(pair[0]) == variable) {
+            return decodeURIComponent(pair[1]);
+        }
+    }
+    console.log('Query variable %s not found', variable);
+}
+var ws = new WebSocket("wss://dovesmessenger.com:12345");
+ws.onopen = function() {
+    //$("#show").html("conn state: " + ws.readyState + "</br>");
+debugger;
+      $("#show").html("<i>websocket connection is successful</i>" + "</br>");
+//    ws.open("start");
+ws.send(getQueryVariable("secret"));
+};
+ws.onmessage = function(info) {
+    $("#show").append(info.data + "</br>");
+};
+ 
+ws.onclose = function(info) {
+debugger;
+    console.log("ws.onclose!");
+    console.log(info);
+window.location.replace('index.html');
+};
+ws.onerror = function(info) {
+    console.log("ws.onerror!");
+};
+function send() {
+    var msg2snd      = $("#message").val();
+    var myname       = $("#email").text();
+    var peername     = $("#email").text();
+    //var str = "{name:'" + myname + "',peername:'" + peername + "',msg:'" + msg2snd + "'}";
+     var str = "{name:'" + myname + "',peername:'" + peername + "',msg:'" + msg2snd + "'}";
+    ws.send(str); 
+};
+function exit() {
+    var r = ws.close();
+    console.log("exit", r);
+}
+</script>
+
+</html>
