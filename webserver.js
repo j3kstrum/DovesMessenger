@@ -36,54 +36,54 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));//Parses incoming requests with url encoded payloads
 
 app.post('/login', function(req,res) {
-	console.log('Email:' + req.body.email);
-	console.log('password:' + req.body.password);
-	var y1=login(req.body.email,req.body.password);
-	y1.then(function(a){
-		if(!a){
-			res.write('0');
-		}
-		else{
-			secret = Math.random();
-			var retObj = 
-			{
-				email: req.body.email,
-				secret: secret
+console.log('Email:' + req.body.email);
+console.log('password:' + req.body.password);
+var y1=login(req.body.email,req.body.password);
+y1.then(function(a){
+if(!a){
+res.write('0');
+}
+else{
+secret = Math.random();
+var retObj = 
+{
+email: req.body.email,
+secret: secret
 
-			};
+};
 
-			res.write(JSON.stringify(retObj));
-		}
-		console.log(a);
-		res.end();
-	}).catch(function error(err){
-		res.write('1');
-		console.log(err);
-	});
-	//res.write('1');
+res.write(JSON.stringify(retObj));
+}
+console.log(a);
+res.end();
+}).catch(function error(err){
+res.write('1');
+console.log(err);
+});
+//res.write('1');
 });
 
 app.post('/register', function(req,res) {
-	console.log('email:' + req.body.email);
-	console.log('password:' + req.body.password);
-	console.log('name:' + req.body.name);
-	console.log('cell:' + req.body.cell);
+console.log('email:' + req.body.email);
+console.log('password:' + req.body.password);
+console.log('name:' + req.body.name);
+console.log('cell:' + req.body.cell);
 //call registration, return '1' if success, '0' if failed ays
     var y2=insertUser(req.body.name,req.body.password,req.body.email,req.body.cell);
-	y2.then(function(a){
-	if(!a){
-		res.write('0');
-	}
-	else{
-		res.write('1');
-	}
-	res.end();
-	console.log(a);
-	}).catch(function error(err){
-		res.write('1');
-		console.log(err);
-	});
-	//res.write('0');
+y2.then(function(a){
+if(!a){
+res.write('0');
+}
+else{
+res.write('1');
+}
+res.end();
+console.log(a);
+}).catch(function error(err){
+res.write('1');
+console.log(err);
+});
+//res.write('0');
 });
 
 var httpsServer = https.createServer(options, app);
@@ -130,16 +130,16 @@ function sckheartbeat() {
 }
 
 wss.broadcast = function broadcast(s,ws) {
-	 
-	  wss.clients.forEach(function each(client) {
+ 
+  wss.clients.forEach(function each(client) {
          if (typeof client.user != "undefined") {
-        	if(s == 1){
-			console.log("sending " + ws.msg + " to " + client.user);
+        if(s == 1){
+console.log("sending " + ws.msg + " to " + client.user);
                           client.send(ws.name + ": " + "'"+ ws.msg + "'");
-        	}
-        	if(s == 0){
-        		client.send(ws + " exit chatroom");	
-        	}
+        }
+        if(s == 0){
+        client.send(ws + " exit chatroom");
+        }
          }
     });
 };
@@ -156,23 +156,23 @@ wss.on('connection', function(ws, req) {
     console.log(ip);
     const ip2 = req.headers['x-forwarded-for'];
     
-	ws.isAlive = true;
+ws.isAlive = true;
     ws.on('message', function(jsonStr,flags) {
-	console.log(jsonStr);
-	if(firstMessage)
-	{
-		firstMessage = false;
-		console.log("secret received = " + jsonStr);
-		console.log("secret stored = " + secret);
-		if(secret != jsonStr)
-		{
-			secret = null;
-			console.log("Secret failed, disconnecting");
-			ws.close();
-			return;
-		}
-		secret = null;
-	}
+console.log(jsonStr);
+if(firstMessage)
+{
+firstMessage = false;
+console.log("secret received = " + jsonStr);
+console.log("secret stored = " + secret);
+if(secret != jsonStr)
+{
+secret = null;
+console.log("Secret failed, disconnecting");
+ws.close();
+return;
+}
+secret = null;
+}
         var obj = eval('(' + jsonStr + ')');
         this.user = obj;
         if (typeof this.user.msg != "undefined") {
@@ -183,9 +183,9 @@ wss.on('connection', function(ws, req) {
 
     ws.on('close', function(close) {
         try{
-        	wss.broadcast(0,this.user.name);
+        wss.broadcast(0,this.user.name);
         }catch(e){
-        	console.log('close, try to refresh.');
+        console.log('close, try to refresh.');
         }
     });
 
@@ -329,6 +329,3 @@ MongoClient.connect(url, function(err, db) {
 //I added the very last line here. 
 
 //}).listen(port1);
-
-
-
