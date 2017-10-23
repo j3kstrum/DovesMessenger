@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<head>
+    <!-- Page Title -->
+    <title>Login</title>
+    
+    <!-- Meta Tags -->
+  
+    <!-- @Author Tushar, Jiewei Shen and Tian  --> 
+    
+    <!-- Theme Styles -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    
+   
+         
+    
+  <script src="jquery.js"></script>
+</head>
+<body style="background-image:url('back.png');" >
+  
+                <form style="margin: auto; padding: 20px; background-color: white; width: 400px; height: 400px; margin-top: 100px; box-shadow: 0px 0px 20px #292929;" id="ajaxForm" action="#" method="post">
+                    <center><h1 style="font-family: sans-serif;">Login</h1></center>
+                    <center><h3 style="color: red; display:none; " id="error" >Login Failed</h3></center>
+                    <center><h3 style="color: green; display:none; " id="success" >Login Success</h3></center>
+                    <div class="form-group">
+                         <label for="email">Email address:</label>
+                         <input required="" type="email" class="form-control" id="email">
+                    </div>
+                    <div class="form-group">
+                         <label for="pwd">Password:</label>
+                         <input required="" type="password" class="form-control" id="password">
+                    </div>
+                     <button type="submit" class="btn btn-primary btn-block">Login</button>
+                     
+                       
+                        <br />
+                        <center><a href="register.html">Please Sign Up Here</a></center>
+                </form>
+               
+            
+ <script>
+ 
+ $('document').ready(function(){
+    $('#ajaxForm').submit(function(e){
+     e.preventDefault();
+     var email=$('#email').val();
+      $('#success').hide();
+      $('#error').hide();
+     var password=$('#password').val();
+     $.ajax({
+        url:"login",
+        method:'post',
+        data:{'email':email,'password':password},
+         
+        success:function(r){
+            if(r==0)
+            {
+               $('#error').show();
+            }
+	    else
+            {
+               $('#success').show(); 
+               //do redirect to index page etc
+		var retObj = JSON.parse(r);
+               window.location.replace('client.html?' + encodeURIComponent("email") + '=' + encodeURIComponent(retObj.email) + '&' + encodeURIComponent("secret") + '=' + encodeURIComponent(retObj.secret));
+            }
+            
+        },
+        error:function(){
+            console.log("failed");
+        }
+    });
+     
+         
+    });
+    
+    
+    
+    
+ });
+ 
+ 
+ </script>           
+            
+</body>
+</html>
