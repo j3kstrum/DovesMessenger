@@ -1,3 +1,5 @@
+# THIS IS FOR THE IN-CLASS ACTIVITY
+
 # Doves - Messenger Application
 ## README
 
