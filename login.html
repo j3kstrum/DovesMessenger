@@ -1,52 +1,92 @@
+
+
+
 <!DOCTYPE html>
-<html>
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
-  <link rel="stylesheet" href="login.css" type="text/css"> </head>
+    <!-- Page Title -->
+    <title>Login</title>
+    
+    <!-- Meta Tags -->
+  
 
-<body>
-  <nav class="navbar navbar-expand-md bg-primary navbar-dark" id="navbar">
-    <div class="container">
-      <a class="navbar-brand" href="#"><i class="fa d-inline fa-lg fa-cloud"></i><b class="text-white" contenteditable="true">&nbsp;Doves Messenger</b></a>
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar2SupportedContent"
-        aria-controls="navbar2SupportedContent" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
-      <div class="collapse navbar-collapse text-center justify-content-end" id="navbar2SupportedContent">
-        <ul class="navbar-nav"></ul>
-        <a class="btn navbar-btn ml-2 text-white btn-secondary" id="Sign" href="index.html"><i class="fa d-inline fa-lg fa-home"></i>&nbsp;Home</a>
-        <a class="btn navbar-btn ml-2 text-white btn-secondary" id="Sign" href="register.html">Register Here</a>
-      </div>
-    </div>
-  </nav>
-  <div class="py-5 h-100 w-100 gradient-overlay mx-auto" style="background-image: url(&quot;https://static.pexels.com/photos/276254/pexels-photo-276254.jpeg&quot;);">
-    <div class="container">
-      <div class="row px-5 w-100 h-100">
-        <div class="col-md-3"> </div>
-        <div class="col-md-6">
-          <div class="card text-white p-5 bg-primary">
-            <div class="card-body">
-              <h1 class="mb-4">Login</h1>
-              <form action="https://formspree.io/YOUREMAILHERE">
-                <div class="form-group"> <label>Email address</label>
-                  <input type="email" class="form-control" placeholder="Enter email"> </div>
-                <div class="form-group"> <label>Password</label>
-                  <input type="password" class="form-control" placeholder="Password"> </div>
-                <button type="submit" class="btn btn-secondary">Login</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12"> </div>
-      </div>
-    </div>
-  </div>
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+    
+    <!-- Theme Styles -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    
+   
+         
+    
+  <script src="jquery.js"></script>
+</head>
+<body style="background-image:url('back.png');" >
+  
+                <form style="margin: auto; padding: 20px; background-color: white; width: 400px; height: 400px; margin-top: 100px; box-shadow: 0px 0px 20px #292929;" id="ajaxForm" action="#" method="post">
+                    <center><h1 style="font-family: sans-serif;">Login</h1></center>
+                    <center><h3 style="color: red; display:none; " id="error" >Login Failed</h3></center>
+                    <center><h3 style="color: green; display:none; " id="success" >Login Success</h3></center>
+                    <div class="form-group">
+                         <label for="email">Email address:</label>
+                         <input required="" type="email" class="form-control" id="email">
+                    </div>
+                    <div class="form-group">
+                         <label for="pwd">Password:</label>
+                         <input required="" type="password" class="form-control" id="password">
+                    </div>
+                     <button type="submit" class="btn btn-primary btn-block">Login</button>
+                     
+                       
+                        <br />
+                        <center><button type="button" class="btn btn-success" onclick=window.location.href='https://dovesmessenger.com/register.html'>Take Me To Sign Up Page</button></center>
+                        <br>
+                        <center><button type="button" class="btn btn-success" onclick=window.location.href='https://dovesmessenger.com'>Take Me Back To Homepage</button></center>
+                </form>
+               
+            
+ <script>
+ 
+ $('document').ready(function(){
+    $('#ajaxForm').submit(function(e){
+     e.preventDefault();
+     var email=$('#email').val();
+      $('#success').hide();
+      $('#error').hide();
+     var password=$('#password').val(); // for encoding as you said...
+     $.ajax({
+        url:"login",
+        method:'post',
+        data:{'email':email,'password':password},
+         
+        success:function(r){
+            if(r==0)
+            {
+               $('#error').show();
+            }
+	    else
+            {
+               $('#success').show(); 
+               //do redirect to index page etc
+		var retObj = JSON.parse(r);
+               window.location.replace('client.html?' + encodeURIComponent("email") + '=' + encodeURIComponent(retObj.email) + '&' + encodeURIComponent("secret") + '=' + encodeURIComponent(retObj.secret));
+            }
+            
+        },
+        error:function(){
+            console.log("failed");
+        }
+    });
+     
+         
+    });
+    
+    
+    
+    
+ });
+ 
+ 
+ </script>           
+            
 </body>
-
 </html>
+
